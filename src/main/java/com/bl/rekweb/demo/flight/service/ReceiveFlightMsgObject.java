@@ -87,6 +87,24 @@ public class ReceiveFlightMsgObject {
                     item.setAltitude((Double)objectList.get(7));
             }
 
+            if(objectList.get(8)!=null){
+                    item.setOnGround((Boolean)objectList.get(8));
+            }
+
+            if(objectList.get(9)!=null){
+                if(objectList.get(9) instanceof Integer)
+                    item.setVelocity((Integer)objectList.get(9));
+                else if(objectList.get(9) instanceof Double)
+                    item.setVelocity((Double)objectList.get(9));
+            }
+
+            if(objectList.get(10)!=null){
+                if(objectList.get(10) instanceof Integer)
+                    item.setHeading((Integer)objectList.get(10));
+                else if(objectList.get(10) instanceof Double)
+                    item.setHeading((Double)objectList.get(10));
+            }
+
             //item.setAltitude((Double)objectList.get(7));
             //Item item = new Item((String)objectList.get(0),(String)objectList.get(2),(Integer)objectList.get(3),(Integer)objectList.get(5),(Integer)objectList.get(6),
             //        (Integer)objectList.get(7));

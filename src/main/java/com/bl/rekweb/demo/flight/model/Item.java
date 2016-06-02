@@ -12,6 +12,8 @@
  */
 package com.bl.rekweb.demo.flight.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Author andry on 31/05/16.
  */
@@ -23,6 +25,10 @@ public class Item {
     double latitude;
     double longitude;
     double altitude;
+    @JsonProperty("on_ground")
+    boolean onGround;
+    double velocity;
+    double heading;
     
 
     public Item() {
@@ -35,6 +41,18 @@ public class Item {
         this.latitude = latitude;
         this.longitude = longitude;
         this.altitude = altitude;
+    }
+
+    public Item(String id, String country, int time, double latitude, double longitude, double altitude, boolean onGround, double velocity, double heading) {
+        this.id = id;
+        this.country = country;
+        this.time = time;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.altitude = altitude;
+        this.onGround = onGround;
+        this.velocity = velocity;
+        this.heading = heading;
     }
 
     public String getId() {
@@ -85,6 +103,30 @@ public class Item {
         this.altitude = altitude;
     }
 
+    public boolean isOnGround() {
+        return onGround;
+    }
+
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
+    }
+
+    public double getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(double velocity) {
+        this.velocity = velocity;
+    }
+
+    public double getHeading() {
+        return heading;
+    }
+
+    public void setHeading(double heading) {
+        this.heading = heading;
+    }
+
     @Override
     public String toString() {
         return "Item{" +
@@ -94,6 +136,9 @@ public class Item {
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", altitude=" + altitude +
+                ", onGround=" + onGround +
+                ", velocity=" + velocity +
+                ", heading=" + heading +
                 '}';
     }
 }

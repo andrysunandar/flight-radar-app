@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>AdminLTE 2 | Dashboard</title>
+  <title>Flight Radar | Map</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.6 -->
@@ -83,23 +83,7 @@
             <li class="active"><a href="#"><i class="fa fa-circle-o"></i> ROADMAP </a></li>
             <li ><a href="#"><i class="fa fa-circle-o"></i> HYBIRD </a></li>
           </ul>
-        </li>
-          <!--
-
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-pie-chart"></i>
-            <span>Charts</span>
-            <i class="fa fa-angle-left pull-right"></i>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="pages/charts/chartjs.html"><i class="fa fa-circle-o"></i> ChartJS</a></li>
-            <li><a href="pages/charts/morris.html"><i class="fa fa-circle-o"></i> Morris</a></li>
-            <li><a href="pages/charts/flot.html"><i class="fa fa-circle-o"></i> Flot</a></li>
-            <li><a href="pages/charts/inline.html"><i class="fa fa-circle-o"></i> Inline charts</a></li>
-          </ul>
-        </li>
-        -->
+        </li>        
 
       </ul>
     </section>
@@ -111,8 +95,9 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Map Radar
-        <small>Version 0.1.0</small>
+        Flight Map Radar
+        <small>Version 0.2.0</small>
+          <small><div id="lastUpdate">last update</div></small>
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -137,7 +122,7 @@
 
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
-      <b>Version</b> 2.3.3
+      <b>Version</b> 0.2.0
     </div>
     <strong>Copyright &copy; 2015-2016 <a href="#">Universitas BudiLuhur</a>.</strong> All rights
     reserved.
@@ -374,7 +359,10 @@
     
     var flightData;
     var infowindow = new google.maps.InfoWindow();
-    var markerImage = 'marker.png';
+    var markerImage = {
+        url: 'marker.png',
+        rotation : 150.0
+    };
     var markers = [];
     var latLng = [];
     var details = [];
@@ -399,8 +387,8 @@
     function initMap() {
         
         var mapProp = {
-            center: new google.maps.LatLng(0, 0), //LLANDRINDOD WELLS
-            zoom: 2,
+            center: new google.maps.LatLng(50, 15), //LLANDRINDOD WELLS
+            zoom: 5,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         map = new google.maps.Map(document.getElementById("map"), mapProp);
@@ -410,8 +398,8 @@
             markers[i] = new google.maps.Marker({
                 //position: latLng[i],
                 map: map,
-                icon: markerImage
-                //title: data.country
+                icon: markerImage,
+                rotation: 120
             });
         }
 
@@ -425,13 +413,22 @@
 
                 //console.log("message => "+message.body);
                 flightData = JSON.parse(message.body);
-                
+                //update time 
+                $('#lastUpdate').text("Last Update : "+  new Date(flightData.time * 1000));
                 for(i=0;i<flightData.itemList.length;i++){
                     var data = flightData.itemList[i];
                     //console.log("<<<<<<<<<<<<<<<<<< flight data >>>>>>>>>>>>>>>>>>>");
                     console.log(data)
-                    latLng[i] = new google.maps.LatLng(data.latitude, data.longitude);                    
-                    details[i] = data.country + ", " + data.altitude + ".";                    
+                    latLng[i] = new google.maps.LatLng(data.latitude, data.longitude);                   
+                    details[i] = "plane id : "+data.id + "<br/>" +                            
+                                 "country  : "+ data.country + "<br/>" +
+                                 "lat  : "+ data.latitude + "<br/>" +
+                                 "lon  : "+ data.longitude + "<br/>" +
+                                 "altitude : "+ data.altitude + " m<br/>" +
+                                 "velocity : "+ data.velocity + " m/s<br/>" +
+                                 "heading  : "+ data.heading+" degree"
+                                
+                    ;
                     markers[i].setPosition(latLng[i]);
                     //console.log("markers => "+markers[i].position);
                     bindInfoWindow(markers[i], map, infowindow, details[i]);
