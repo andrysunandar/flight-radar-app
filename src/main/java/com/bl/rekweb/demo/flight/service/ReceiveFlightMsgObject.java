@@ -55,28 +55,38 @@ public class ReceiveFlightMsgObject {
         //logger.info("object msg => "+msg.getStates().get(0).toString());
         List<Item> itemList = new ArrayList<Item>();
 
-        for(int i=0;i < 5;i++){
+        for(int i=0;i < 10;i++){
             logger.info("object msg => "+msg.getStates().get(i).toString());
             List<Object> objectList = msg.getStates().get(i);
             Item item = new Item();
-            item.setId((String)objectList.get(0));
-            item.setCountry((String)objectList.get(2));
-            item.setTime((Integer)objectList.get(3));
-            item.setLatitude((Double)objectList.get(5));
-            item.setLongitude((Double)objectList.get(6));
+            if(objectList.get(0)!=null)
+                item.setId((String)objectList.get(0));
+            if(objectList.get(2)!=null)
+                item.setCountry((String)objectList.get(2));
+            if(objectList.get(3)!=null)
+                item.setTime((Integer)objectList.get(3));
 
-            if(objectList.get(5) instanceof Integer)
-                item.setLatitude((Integer)objectList.get(5));
-            else if(objectList.get(5) instanceof Double)
-                item.setLatitude((Double)objectList.get(5));
-            if(objectList.get(6) instanceof Integer)
-                item.setLongitude((Integer)objectList.get(6));
-            else if(objectList.get(6) instanceof Double)
-                item.setLongitude((Double)objectList.get(6));
-            if(objectList.get(7) instanceof Integer)
-                item.setAltitude((Integer)objectList.get(7));
-            else if(objectList.get(7) instanceof Double)
-                item.setAltitude((Double)objectList.get(7));
+            if(objectList.get(6)!=null){
+                if(objectList.get(6) instanceof Integer)
+                    item.setLatitude((Integer)objectList.get(6));
+                else if(objectList.get(6) instanceof Double)
+                    item.setLatitude((Double)objectList.get(6));
+            }
+
+            if(objectList.get(5)!=null){
+                if(objectList.get(5) instanceof Integer)
+                    item.setLongitude((Integer)objectList.get(5));
+                else if(objectList.get(5) instanceof Double)
+                    item.setLongitude((Double)objectList.get(5));
+            }
+
+            if(objectList.get(7)!=null){
+                if(objectList.get(7) instanceof Integer)
+                    item.setAltitude((Integer)objectList.get(7));
+                else if(objectList.get(7) instanceof Double)
+                    item.setAltitude((Double)objectList.get(7));
+            }
+
             //item.setAltitude((Double)objectList.get(7));
             //Item item = new Item((String)objectList.get(0),(String)objectList.get(2),(Integer)objectList.get(3),(Integer)objectList.get(5),(Integer)objectList.get(6),
             //        (Integer)objectList.get(7));
@@ -87,9 +97,7 @@ public class ReceiveFlightMsgObject {
         flightDataObject.setTime(msg.getTime());
         flightDataObject.setItemList(itemList);
         //logger.info("flight data object limit 5 : "+flightDataObject.toString() );
-        
         jmsProducer.sendData(mapper.writeValueAsString(flightDataObject));
-        
         
     }
 }

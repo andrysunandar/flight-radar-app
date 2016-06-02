@@ -405,7 +405,7 @@
         };
         map = new google.maps.Map(document.getElementById("map"), mapProp);
         
-        for(i=0;i<5;i++){
+        for(i=0;i<10;i++){
             // preparing the map markers
             markers[i] = new google.maps.Marker({
                 //position: latLng[i],
@@ -413,46 +413,48 @@
                 icon: markerImage
                 //title: data.country
             });
-            
         }
 
     }
-
         function connect () {
-        //var url = 'ws://kitapiknik73.noip.me:61614';
-        var url = 'ws://192.168.10.204:61614';
+        var url = 'ws://kitapiknik73.noip.me:61614';
+        //var url = 'ws://192.168.10.204:61614';
         var client = Stomp.client(url);
         client.connect('admin', 'password', function() {
             client.subscribe('/topic/flight_data', function(message) {
 
-                console.log("message => "+message.body);
+                //console.log("message => "+message.body);
                 flightData = JSON.parse(message.body);
                 
                 for(i=0;i<flightData.itemList.length;i++){
                     var data = flightData.itemList[i];
+                    //console.log("<<<<<<<<<<<<<<<<<< flight data >>>>>>>>>>>>>>>>>>>");
+                    console.log(data)
                     latLng[i] = new google.maps.LatLng(data.latitude, data.longitude);                    
-                    details[i] = data.country + ", " + data.altitude + ".";
+                    details[i] = data.country + ", " + data.altitude + ".";                    
                     markers[i].setPosition(latLng[i]);
+                    //console.log("markers => "+markers[i].position);
                     bindInfoWindow(markers[i], map, infowindow, details[i]);
                 }
 
+                /*
                 $.each(flightData.itemList, function (key, data) {
 
                     //latLng = new google.maps.LatLng(data.latitude, data.longitude);
                     
-                    /*
+                   
                     var marker = new google.maps.Marker({
                         position: latLng,
                         map: map,
                         icon: markerImage,
                         title: data.country
                     });
-                    */
+                    
 
                     //var details = data.title + ", " + data.altitude + ".";
                     //bindInfoWindow(marker, map, infowindow, details);
 
-                });
+                });*/
 
             });
         });

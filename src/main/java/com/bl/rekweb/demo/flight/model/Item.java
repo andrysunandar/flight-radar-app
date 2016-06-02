@@ -23,6 +23,7 @@ public class Item {
     double latitude;
     double longitude;
     double altitude;
+    
 
     public Item() {
     }
