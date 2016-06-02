@@ -35,9 +35,9 @@ public class JmsProducer {
 
 
     public void sendData(String data) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();        
-        //logger.info("convert to json => "+mapper.writeValueAsString(data)); 
-        logger.info("<<<<<<<<<<<<<<  SEND JSON DATA TO GANTT TOPIC  >>>>>>>>>>>>>>>");
+
+        logger.info("<<<<<<<<<<<<<<  SEND JSON DATA TO FLIGHT TOPIC  >>>>>>>>>>>>>>>");
+        logger.info(data);
 
         // convert MarineOrder to gantt_data tasks
         //String tasks = convertMarineOrderToGanttData(mo);

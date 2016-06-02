@@ -338,6 +338,7 @@
 </div>
 <!-- ./wrapper -->
 
+
 <!-- jQuery 2.2.0 -->
 <script src="plugins/jQuery/jQuery-2.2.0.min.js"></script>
 <!-- Bootstrap 3.3.6 -->
@@ -364,10 +365,99 @@
 -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFGUsKyREByOV3FeFV71EpUiYkmuz9mWM" > </script>
 
+<script src="../../libs/stomp.js"></script>
+<script src="../../libs/sockjs-0.3.4.js"></script>
+
 <script src="dist/js/custom.js"></script>
 
+<script type="text/javascript">
+    
+    var flightData;
+    var infowindow = new google.maps.InfoWindow();
+    var markerImage = 'marker.png';
+    var markers = [];
+    var latLng = [];
+    var details = [];
 
+    //var map;
+   
+    $(document).ready(function() {
+        console.log("connect to broker........");
+        initMap();
+        connect();
+        google.maps.event.addDomListener(window, 'load', initMap);
 
+    });
+    
+    function bindInfoWindow(marker, map, infowindow, strDescription) {
+        google.maps.event.addListener(marker, 'click', function () {
+            infowindow.setContent(strDescription);
+            infowindow.open(map, marker);
+        });
+    }
 
-</body>
+    function initMap() {
+        
+        var mapProp = {
+            center: new google.maps.LatLng(0, 0), //LLANDRINDOD WELLS
+            zoom: 2,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById("map"), mapProp);
+        
+        for(i=0;i<5;i++){
+            // preparing the map markers
+            markers[i] = new google.maps.Marker({
+                //position: latLng[i],
+                map: map,
+                icon: markerImage
+                //title: data.country
+            });
+            
+        }
+
+    }
+
+        function connect () {
+        //var url = 'ws://kitapiknik73.noip.me:61614';
+        var url = 'ws://192.168.10.204:61614';
+        var client = Stomp.client(url);
+        client.connect('admin', 'password', function() {
+            client.subscribe('/topic/flight_data', function(message) {
+
+                console.log("message => "+message.body);
+                flightData = JSON.parse(message.body);
+                
+                for(i=0;i<flightData.itemList.length;i++){
+                    var data = flightData.itemList[i];
+                    latLng[i] = new google.maps.LatLng(data.latitude, data.longitude);                    
+                    details[i] = data.country + ", " + data.altitude + ".";
+                    markers[i].setPosition(latLng[i]);
+                    bindInfoWindow(markers[i], map, infowindow, details[i]);
+                }
+
+                $.each(flightData.itemList, function (key, data) {
+
+                    //latLng = new google.maps.LatLng(data.latitude, data.longitude);
+                    
+                    /*
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        map: map,
+                        icon: markerImage,
+                        title: data.country
+                    });
+                    */
+
+                    //var details = data.title + ", " + data.altitude + ".";
+                    //bindInfoWindow(marker, map, infowindow, details);
+
+                });
+
+            });
+        });
+    }
+
+</script>
+    </body>
 </html>

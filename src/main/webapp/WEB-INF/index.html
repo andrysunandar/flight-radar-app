@@ -19,13 +19,13 @@
     });
 
     function connect () {
-        var url = 'ws://kitapiknik73.noip.me:61614';
+        var url = 'ws://192.168.10.204:61614';
         var client = Stomp.client(url);
         client.connect('admin', 'password', function() {
             client.subscribe('/topic/flight_data', function(message) {
                 
             console.log("message => "+message.body);
-                //tasks = JSON.parse(message.body);                
+                data = JSON.parse(message.body);
             });
         });
     }
