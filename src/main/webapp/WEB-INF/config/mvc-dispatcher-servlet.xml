@@ -2,8 +2,62 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:s="http://www.springframework.org/schema/security"
        xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd">
+
+
+
+<context:component-scan base-package="com.bl.rekweb.demo.flight.web.controller" />
+    <!--
+    <mvc:resources mapping="/css/**" location="/WEB-INF/resources/assets/css/" />
+    <mvc:resources mapping="/js/**" location="/WEB-INF/resources/assets/js/" />
+    -->
+    <mvc:resources mapping="/assets/**" location="/WEB-INF/assets/AdminLTE-2.3.3/" />
+    <!--
+    <mvc:resources mapping="/ico/**" location="/WEB-INF/resources/ico/" />
+    <mvc:resources mapping="/fonts/**" location="/WEB-INF/resources/assets/fonts/" />
+    -->
+    <mvc:annotation-driven />
+
+    <bean id="templateResolver"
+          class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
+        <property name="prefix" value="/WEB-INF/assets/AdminLTE-2.3.3/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML5" />
+    </bean>
+
+    <bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver" />
+    </bean>
+
+    <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine" />
+    </bean>
+
+    <!--
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="defaultEncoding" value="utf-8" />
+        <property name="workingDirectory" value="/WEB-INF/webspring/i18n" />
+        <property name="cacheSeconds" value="3" />
+        <property name="fallbackToSystemLocale" value="false" />
+    </bean>
+
+
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>messages</value>
+                <value>errormsg</value>
+            </list>
+        </property>
+    </bean>
+
+    -->
 
 </beans>
 
