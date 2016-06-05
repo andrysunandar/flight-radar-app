@@ -25,6 +25,10 @@
             width: 100%;
             height: 500px;
         }
+        #legend {
+            background: white;
+            padding: 10px;
+        }
     </style>
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -111,10 +115,10 @@
              
       <div id="map" class="col-sm-6 map">
           
-      </div>  
-
-
-      <!-- /.row -->
+          
+      </div>
+       
+    <!-- /.row -->
     </section>
     <!-- /.content -->
   </div>
@@ -161,8 +165,8 @@
 -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFGUsKyREByOV3FeFV71EpUiYkmuz9mWM" > </script>
 
-<script src="../../libs/stomp.js"></script>
-<script src="../../libs/sockjs-0.3.4.js"></script>
+<script src="libs/stomp.js"></script>
+<script src="libs/sockjs-0.3.4.js"></script>
 
 <script src="dist/js/custom.js"></script>
 
@@ -171,27 +175,44 @@
     var flightData;
     var infowindow = new google.maps.InfoWindow();
     var markerImage = {
-        url: 'marker.png',
-        rotation : 150.0
+        path : google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        fillColor: 'white',
+        //fillOpacity: 0.8,
+        scale: 3,
+        strokeColor: 'blue',
+        animation:google.maps.Animation.DROP
+        //strokeWeight: 6
+        //url: 'marker.png',
+        /*
+        path: 'M88 104 c-13 -14 -22 -15 -47 -6 -38 14 -52 -3 -17 -20 31 -13 34 '+
+              '-28 6 -28 -23 0 -26 -10 -8 -28 17 -17 25 -15 32 11 6 22 7 22 22 -6 19 -35 '+
+              '36 -26 23 12 -8 23 -7 35 6 55 19 29 8 35 -17 10z',
+
+        fillColor: 'red',
+        fillOpacity: 0.8,
+        scale: 1,
+        strokeColor: 'gold',
+        strokeWeight: 6
+        */
     };
     var markers = [];
     var latLng = [];
     var details = [];
-
-    //var map;
+    var flights = {};
+    var map;
    
     $(document).ready(function() {
         console.log("connect to broker........");
         initMap();
         connect();
         google.maps.event.addDomListener(window, 'load', initMap);
-
+        
     });
     
-    function bindInfoWindow(marker, map, infowindow, strDescription) {
+    function bindInfoWindow(marker, infowindow, strDescription) {
         google.maps.event.addListener(marker, 'click', function () {
             infowindow.setContent(strDescription);
-            infowindow.open(map, marker);
+            infowindow.open(map,marker);
         });
     }
 
@@ -200,70 +221,89 @@
         var mapProp = {
             center: new google.maps.LatLng(50, 15), //LLANDRINDOD WELLS
             zoom: 5,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            mapTypeId: google.maps.MapTypeId.TERRAIN
         };
         map = new google.maps.Map(document.getElementById("map"), mapProp);
-        
-        for(i=0;i<10;i++){
-            // preparing the map markers
-            markers[i] = new google.maps.Marker({
-                //position: latLng[i],
-                map: map,
-                icon: markerImage,
-                rotation: 120
-            });
-        }
 
     }
         function connect () {
-        var url = 'ws://192.168.10.204:61614';
-        //var url = 'ws://'+document.location.host+':61614';
+        //var url = 'ws://192.168.10.204:61614';
+        //var url = 'ws://kitapiknik73.noip.me:61614';
+        var url = 'ws://'+document.location.host+':61614';
         //var url = 'ws://192.168.10.204:61614';
         var client = Stomp.client(url);
+        //client.heartbeat.outgoing = 5000;
+        //client.heartbeat.incoming = 5000;
         client.connect('admin', 'password', function() {
+            
             client.subscribe('/topic/flight_data', function(message) {
 
                 //console.log("message => "+message.body);
                 flightData = JSON.parse(message.body);
-                //update time 
+
                 $('#lastUpdate').text("Last Update : "+  new Date(flightData.time * 1000));
-                for(i=0;i<flightData.itemList.length;i++){
-                    var data = flightData.itemList[i];
-                    //console.log("<<<<<<<<<<<<<<<<<< flight data >>>>>>>>>>>>>>>>>>>");
-                    console.log(data)
-                    latLng[i] = new google.maps.LatLng(data.latitude, data.longitude);                   
-                    details[i] = "plane id : "+data.id + "<br/>" +                            
-                                 "country  : "+ data.country + "<br/>" +
-                                 "lat  : "+ data.latitude + "<br/>" +
-                                 "lon  : "+ data.longitude + "<br/>" +
-                                 "altitude : "+ data.altitude + " m<br/>" +
-                                 "velocity : "+ data.velocity + " m/s<br/>" +
-                                 "heading  : "+ data.heading+" degree"
-                                
-                    ;
-                    markers[i].setPosition(latLng[i]);
-                    //console.log("markers => "+markers[i].position);
-                    bindInfoWindow(markers[i], map, infowindow, details[i]);
-                }
 
-                /*
-                $.each(flightData.itemList, function (key, data) {
+                // create flight map object
+                $.each(flightData.itemList, function( key, value ){
+                            flights[value.id] = value;
+                        }
+                )
+                // loop through all flight object
+                $.each(flights, function(key,value){
+                    //console.log("flights object : "+key);
+                    // assign markers
+                    if(!(value.id in markers)){
+                        console.log("markers doesn't exist, create new markers...")
+                        markers[value.id] = new google.maps.Marker({
+                            //position: latLng[value.id],
+                            //map: map,
+                            icon: markerImage
+                        });
+                    }
+                    // create marker detail 
+                    details[value.id] = "plane id : "+value.id + "<br/>" +
+                            "country  : "+ value.country + "<br/>" +
+                            "lat  : "+ value.latitude + "<br/>" +
+                            "lon  : "+ value.longitude + "<br/>" +
+                            "altitude : "+ value.altitude + " m<br/>" +
+                            "velocity : "+ value.velocity + " m/s<br/>" +
+                            "heading  : "+ value.heading+" degree<br/>" +
+                            "on ground : "+ value.on_ground;
 
-                    //latLng = new google.maps.LatLng(data.latitude, data.longitude);
+                    // create new lat long coordinate every update data
+                    latLng[value.id] = new google.maps.LatLng(value.latitude, value.longitude);
                     
-                   
-                    var marker = new google.maps.Marker({
-                        position: latLng,
-                        map: map,
-                        icon: markerImage,
-                        title: data.country
-                    });
+                    // set markers position
+                    markers[value.id].setPosition(latLng[value.id]);
                     
+                    // set markers rotation
+                    markers[value.id].icon.rotation = value.heading;
+                    
+                    // check plane position
+                    if(value.on_ground){
+                        markers[value.id].icon.strokeColor = 'green';
+                    }
+                    // check un updated data for 1 menit
+                    if((flightData.time - value.time) > 60 ){
+                        markers[value.id].icon.strokeColor = 'red';
+                    }else{
+                        markers[value.id].icon.strokeColor = 'blue';
+                    }
 
-                    //var details = data.title + ", " + data.altitude + ".";
-                    //bindInfoWindow(marker, map, infowindow, details);
+                    // delete un updated flight data for 5 minutes
+                    if((flightData.time - value.time) > 300 ){
+                        //assign map to markers
+                        markers[value.id].setMap(null);
+                        delete flights[value.id];
+                        
+                    }else{
+                        //assign map to markers
+                        markers[value.id].setMap(map);
+                        // bind info to markers
+                        bindInfoWindow(markers[value.id], infowindow, details[value.id]);
+                    }                                       
 
-                });*/
+                })                
 
             });
         });
