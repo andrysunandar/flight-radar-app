@@ -126,9 +126,9 @@
 
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
-      <b>Version</b> 0.2.0
+      <b>Version</b> 0.2.1
     </div>
-    <strong>Copyright &copy; 2015-2016 <a href="#">Universitas BudiLuhur</a>.</strong> All rights
+    <strong>Copyright &copy; 2016-2017 <a href="#">Universitas BudiLuhur</a>.</strong> All rights
     reserved.
   </footer>
 
@@ -227,9 +227,9 @@
 
     }
         function connect () {
-        //var url = 'ws://192.168.10.204:61614';
+        var url = 'ws://192.168.10.204:61614';
         //var url = 'ws://kitapiknik73.noip.me:61614';
-        var url = 'ws://'+document.location.host+':61614';
+        //var url = 'ws://'+document.location.host+':61614';
         //var url = 'ws://192.168.10.204:61614';
         var client = Stomp.client(url);
         //client.heartbeat.outgoing = 5000;
@@ -280,14 +280,13 @@
                     markers[value.id].icon.rotation = value.heading;
                     
                     // check plane position
-                    if(value.on_ground){
+                    if(value.on_ground || (value.altitude < 100) ){
                         markers[value.id].icon.strokeColor = 'green';
-                    }
-                    // check un updated data for 1 menit
-                    if((flightData.time - value.time) > 60 ){
-                        markers[value.id].icon.strokeColor = 'red';
-                    }else{
+                        // check un updated data for 1 menit
+                    }else if((flightData.time - value.time) > 60 ){
                         markers[value.id].icon.strokeColor = 'blue';
+                    }else{
+                        markers[value.id].icon.strokeColor = 'red';
                     }
 
                     // delete un updated flight data for 5 minutes

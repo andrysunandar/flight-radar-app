@@ -34,6 +34,9 @@ public class ReceiveFlightMsgObject {
 
     @Autowired
     private JmsProducer jmsProducer;
+    
+    @Autowired
+    private FlightDataDbService flightDataDbService;
 
     public void printData(FlightData msg) throws JsonProcessingException {
         logger.info("<<<<<<<<<<<<<<< CONVERT JSON TO OBJECT >>>>>>>>>>>>>>>>>>>>");
@@ -60,7 +63,7 @@ public class ReceiveFlightMsgObject {
             List<Object> objectList = msg.getStates().get(i);
             Item item = new Item();
             if(objectList.get(0)!=null)
-                item.setId((String)objectList.get(0));
+                item.setPlaneId((String)objectList.get(0));
             if(objectList.get(2)!=null)
                 item.setCountry((String)objectList.get(2));
             if(objectList.get(3)!=null)
@@ -105,16 +108,14 @@ public class ReceiveFlightMsgObject {
                     item.setHeading((Double)objectList.get(10));
             }
 
-            //item.setAltitude((Double)objectList.get(7));
-            //Item item = new Item((String)objectList.get(0),(String)objectList.get(2),(Integer)objectList.get(3),(Integer)objectList.get(5),(Integer)objectList.get(6),
-            //        (Integer)objectList.get(7));
             logger.info("items : "+item);
             itemList.add(item);
         }
         FlightDataObject flightDataObject = new FlightDataObject();
         flightDataObject.setTime(msg.getTime());
         flightDataObject.setItemList(itemList);
-        //logger.info("flight data object limit 5 : "+flightDataObject.toString() );
+        // save to database
+        flightDataDbService.save(flightDataObject);
         jmsProducer.sendData(mapper.writeValueAsString(flightDataObject));
         
     }

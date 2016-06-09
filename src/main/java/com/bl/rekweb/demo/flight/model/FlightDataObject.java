@@ -12,14 +12,24 @@
  */
 package com.bl.rekweb.demo.flight.model;
 
+import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.List;
 
 /**
  * Author andry on 31/05/16.
  */
+@Entity
+@Table(name = "flight_data_object")
 public class FlightDataObject {
-    
+
+    @Id
+    @Column(name = "id")
     int time;
+
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "time_id")
     List<Item> itemList;
         
     public FlightDataObject() {

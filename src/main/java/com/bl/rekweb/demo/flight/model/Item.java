@@ -14,37 +14,53 @@ package com.bl.rekweb.demo.flight.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.persistence.*;
+
 /**
  * Author andry on 31/05/16.
  */
+@Entity
+@Table(name = "item")
 public class Item {
+
+    @Id
+    @GeneratedValue       
+    int id;
     
-    String id;
+    @Column(name = "plane_id")
+    @JsonProperty("plane_id")
+    String planeId;
+    
+    @Column
     String country;
+    
+    @Column
     int time;
+    
+    @Column
     double latitude;
+
+    @Column
     double longitude;
+
+    @Column
     double altitude;
+    
+    @Column
     @JsonProperty("on_ground")
     boolean onGround;
+
+    @Column
     double velocity;
+
+    @Column
     double heading;
-    
 
     public Item() {
     }
 
-    public Item(String id, String country, int time, double latitude, double longitude, double altitude) {
-        this.id = id;
-        this.country = country;
-        this.time = time;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.altitude = altitude;
-    }
-
-    public Item(String id, String country, int time, double latitude, double longitude, double altitude, boolean onGround, double velocity, double heading) {
-        this.id = id;
+    public Item(String planeId, String country, int time, double latitude, double longitude, double altitude, boolean onGround, double velocity, double heading) {
+        this.planeId = planeId;
         this.country = country;
         this.time = time;
         this.latitude = latitude;
@@ -55,12 +71,20 @@ public class Item {
         this.heading = heading;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
+    }
+
+    public String getPlaneId() {
+        return planeId;
+    }
+
+    public void setPlaneId(String planeId) {
+        this.planeId = planeId;
     }
 
     public String getCountry() {
@@ -130,8 +154,7 @@ public class Item {
     @Override
     public String toString() {
         return "Item{" +
-                "id='" + id + '\'' +
-                ", country='" + country + '\'' +
+                "country='" + country + '\'' +
                 ", time=" + time +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
@@ -139,6 +162,7 @@ public class Item {
                 ", onGround=" + onGround +
                 ", velocity=" + velocity +
                 ", heading=" + heading +
+                ", planeId='" + planeId + '\'' +
                 '}';
     }
 }

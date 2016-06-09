@@ -10,15 +10,16 @@
  *  Report bugs to <techsupport@innovez-one.com>.
  *  Copyright (C) 2015 PT. Innovez-One. All rights reserved.
  */
-package com.bl.rekweb.demo.flight.model;
+package com.bl.rekweb.demo.flight.service;
+
+import com.bl.rekweb.demo.flight.model.FlightDataObject;
+import org.springframework.stereotype.Service;
 
 /**
- * Author andry on 31/05/16.
+ * Author andry on 07/06/16.
  */
-public class HelloMessage {
-
-    private String name;
-    public String getName() {
-        return name;
-    }
+@Service
+public interface FlightDataDbService {
+    
+    public void save(FlightDataObject data);
 }

@@ -225,8 +225,8 @@
     }
     function connect () {
         //var url = 'ws://192.168.10.204:61614';
-        var url = 'ws://kitapiknik73.noip.me:61614';
-        //var url = 'ws://'+document.location.host+':61614';
+        //var url = 'ws://kitapiknik73.noip.me:61614';
+        var url = 'ws://'+document.location.hostname+':61614';
         //var url = 'ws://192.168.10.204:61614';
         var client = Stomp.client(url);
         //client.heartbeat.outgoing = 5000;
@@ -242,23 +242,23 @@
 
                 // create flight map object
                 $.each(flightData.itemList, function( key, value ){
-                            flights[value.id] = value;
+                            flights[value.plane_id] = value;
                         }
                 )
                 // loop through all flight object
                 $.each(flights, function(key,value){
                     //console.log("flights object : "+key);
                     // assign markers
-                    if(!(value.id in markers)){
+                    if(!(value.plane_id in markers)){
                         console.log("markers doesn't exist, create new markers...")
-                        markers[value.id] = new google.maps.Marker({
+                        markers[value.plane_id] = new google.maps.Marker({
                             //position: latLng[value.id],
                             //map: map,
                             icon: markerImage
                         });
                     }
                     // create marker detail
-                    details[value.id] = "plane id : "+value.id + "<br/>" +
+                    details[value.plane_id] = "plane id : "+value.plane_id + "<br/>" +
                             "country  : "+ value.country + "<br/>" +
                             "lat  : "+ value.latitude + "<br/>" +
                             "lon  : "+ value.longitude + "<br/>" +
@@ -268,38 +268,36 @@
                             "on ground : "+ value.on_ground;
 
                     // create new lat long coordinate every update data
-                    latLng[value.id] = new google.maps.LatLng(value.latitude, value.longitude);
+                    latLng[value.plane_id] = new google.maps.LatLng(value.latitude, value.longitude);
 
                     // set markers position
-                    markers[value.id].setPosition(latLng[value.id]);
+                    markers[value.plane_id].setPosition(latLng[value.plane_id]);
 
                     // set markers rotation
-                    markers[value.id].icon.rotation = value.heading;
+                    markers[value.plane_id].icon.rotation = value.heading;
 
                     // check plane position
-                    if(value.on_ground){
-                        markers[value.id].icon.strokeColor = 'green';
-                    }
-                    // check un updated data for 1 menit
-                    if((flightData.time - value.time) > 60 ){
-                        markers[value.id].icon.strokeColor = 'red';
+                    if(value.on_ground || (value.altitude < 100) ){
+                        markers[value.plane_id].icon.strokeColor = 'green';
+                        // check un updated data for 1 menit
+                    }else if((flightData.time - value.time) > 60 ){
+                        markers[value.plane_id].icon.strokeColor = 'blue';
                     }else{
-                        markers[value.id].icon.strokeColor = 'blue';
+                        markers[value.plane_id].icon.strokeColor = 'red';
                     }
 
                     // delete un updated flight data for 5 minutes
                     if((flightData.time - value.time) > 300 ){
                         //assign map to markers
-                        markers[value.id].setMap(null);
-                        delete flights[value.id];
+                        markers[value.plane_id].setMap(null);
+                        delete flights[value.plane_id];
 
                     }else{
                         //assign map to markers
-                        markers[value.id].setMap(map);
+                        markers[value.plane_id].setMap(map);
                         // bind info to markers
-                        bindInfoWindow(markers[value.id], infowindow, details[value.id]);
+                        bindInfoWindow(markers[value.plane_id], infowindow, details[value.plane_id]);
                     }
-
                 })
 
             });
